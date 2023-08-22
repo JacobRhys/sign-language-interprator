@@ -31,8 +31,8 @@ while True:
             
             thumb_tip_position=hand_landmarks.landmark[mphands.HandLandmark.THUMB_TIP]
             index_finger_position=hand_landmarks.landmark[mphands.HandLandmark.INDEX_FINGER_TIP]
-            index_finger_nuckle=hand_landmarks.landmark[mphands.HandLandmark.INDEX_FINGER_MCP]
-            index_finger_base=hand_landmarks.landmark[mphands.HandLandmark.INDEX_FINGER_PIP]
+            index_finger_nuckle=hand_landmarks.landmark[mphands.HandLandmark.INDEX_FINGER_PIP]
+            index_finger_base=hand_landmarks.landmark[mphands.HandLandmark.INDEX_FINGER_MCP]
             middle_finger_position=hand_landmarks.landmark[mphands.HandLandmark.MIDDLE_FINGER_TIP]
             middle_finger_base=hand_landmarks.landmark[mphands.HandLandmark.MIDDLE_FINGER_MCP]
             ring_finger_position=hand_landmarks.landmark[mphands.HandLandmark.RING_FINGER_TIP]
@@ -47,14 +47,16 @@ while True:
             def isHorizontal():
                 return ((palm_top.x-palm_bottom.x)**2>(palm_top.y-palm_bottom.y)**2)
             
-            def thumbOut():
-                return (distance(thumb_tip_position,palm_top)*1.8>palm_distance)
+            def isVertical():
+                return not(isHorizontal())
             
-            def thumbIn():
-                return (distance(thumb_tip_position,middle_finger_position)*3.5<palm_distance or distance(thumb_tip_position,ring_finger_position)*3.5<palm_distance or distance(thumb_tip_position,ring_finger_base)*3.5<palm_distance)
-            
-            def thumbRelaxed():
-                return (not thumbOut() and not thumbIn())
+            def thumbPosition():
+                if (distance(thumb_tip_position,palm_top)*1.5>palm_distance):
+                    return "out"
+                elif (distance(thumb_tip_position,middle_finger_position)*3.5<palm_distance or distance(thumb_tip_position,ring_finger_position)*3.5<palm_distance or distance(thumb_tip_position,ring_finger_base)*3.5<palm_distance):
+                    return "in"
+                else :
+                    return "relaxed"
             
             def indexFingerUp():
                 return (distance(index_finger_position,index_finger_base)*1.5>palm_distance)
@@ -72,30 +74,60 @@ while True:
             #charicter recognition
             charicter = "?"
             
-            if ((not isHorizontal()) and (thumbRelaxed()) and (not indexFingerUp()) and (not middleFingerUp()) and (not ringFingerUp()) and (not pinkyFingerUp())) : 
+            if (isVertical() and (thumbPosition()=="relaxed") and (not indexFingerUp()) and (not middleFingerUp()) and (not ringFingerUp()) and (not pinkyFingerUp())) : 
                 charicter = "A"
             
-            if((palm_top.y > index_finger_position.y)and(palm_top.y > middle_finger_position.y) and (palm_top.y > ring_finger_position.y) and (palm_top.y > pinky_finger_position.y) and 
-               (palm_top.x < pinky_finger_position.x)):
+            if (isVertical() and (thumbPosition()=="relaxed") and indexFingerUp() and middleFingerUp() and ringFingerUp() and pinkyFingerUp()):
                 charicter = "B"
                 
-            if((palm_top.y > index_finger_position.y) and (palm_top.y > middle_finger_position.y) and (palm_top.y > ring_finger_position.y) and (palm_top.y > pinky_finger_position.y) and 
+            if ((palm_top.y > index_finger_position.y) and (palm_top.y > middle_finger_position.y) and (palm_top.y > ring_finger_position.y) and (palm_top.y > pinky_finger_position.y) and 
                (palm_top.x > thumb_tip_position.x) and (palm_top.x > pinky_finger_position.x)):
                 charicter = "C"
             
-            if((palm_top.y > index_finger_position.y) and (palm_top.y < middle_finger_position.y) and (palm_top.y < ring_finger_position.y) and (palm_top.y < pinky_finger_position.y) and
-               (index_finger_position.x < thumb_tip_position.x)):
+            if (isVertical() and (thumbPosition()=="relaxed") and indexFingerUp() and (not middleFingerUp()) and (not ringFingerUp()) and (not pinkyFingerUp())) :
                 charicter = "D"
                 
-            if ((palm_top.y < index_finger_position.y) and (palm_top.y < middle_finger_position.y) and (palm_top.y < ring_finger_position.y) and (palm_top.y < pinky_finger_position.y) and
-                (thumb_tip_position.x > index_finger_position.x)): 
+            if (isVertical() and (thumbPosition()=="in") and (not indexFingerUp()) and (not middleFingerUp()) and (not ringFingerUp()) and (not pinkyFingerUp())) :
                 charicter = "E"
             
+            if (isVertical() and middleFingerUp() and ringFingerUp() and pinkyFingerUp() and
+                (distance(index_finger_position,thumb_tip_position)*3<palm_distance)):
+                charicter = "F"
+
+            if (isHorizontal() and (thumbPosition()=="out") and indexFingerUp() and (not middleFingerUp()) and (not ringFingerUp()) and (not pinkyFingerUp())):
+                charicter = "G"
+                
+            if (isHorizontal() and (thumbPosition()=="out") and indexFingerUp() and middleFingerUp() and (not ringFingerUp()) and (not pinkyFingerUp())):
+                charicter = "H"
+                
+            if (isVertical() and (thumbPosition()=="relaxed") and (not indexFingerUp()) and (not middleFingerUp()) and (not ringFingerUp()) and pinkyFingerUp()):
+                charicter = "I"
+            
+            if (isVertical() and (thumbPosition()=="relaxed") and (not indexFingerUp()) and (not middleFingerUp()) and (not ringFingerUp()) and pinkyFingerUp()):
+                charicter = "J"
+                
+            if (isVertical() and (thumbPosition()=="relaxed") and indexFingerUp() and middleFingerUp() and (not ringFingerUp()) and (not pinkyFingerUp())):
+                charicter = "K"
+            
+            if (isVertical() and (thumbPosition()=="out") and indexFingerUp() and (not middleFingerUp()) and (not ringFingerUp()) and (not pinkyFingerUp())) :
+                charicter = "L"
+            
+            if (isVertical() and (thumbPosition()=="in") and (not indexFingerUp()) and (not middleFingerUp()) and (not ringFingerUp()) and (not pinkyFingerUp()) and
+                (thumb_tip_position.z>ring_finger_position.z)) :
+                charicter = "M"
+            
+            if (isVertical() and (thumbPosition()=="in") and (not indexFingerUp()) and (not middleFingerUp()) and (not ringFingerUp()) and (not pinkyFingerUp()) and
+                (thumb_tip_position.z>ring_finger_position.z) and (distance(index_finger_position,middle_finger_position)*1.2<distance(middle_finger_position,ring_finger_position))) :
+                charicter = "N"
+            
+            if (isVertical() and (not middleFingerUp()) and ( not ringFingerUp()) and (not pinkyFingerUp()) and
+                (distance(index_finger_position,thumb_tip_position)*3<palm_distance)):
+                charicter = "O"
             
             #output charicter onto screen
             cv2.putText(image, charicter, (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 255, 255), 3, cv2.LINE_AA)
             cv2.putText(image, ("horisontal "+str(isHorizontal())), (50, 200), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1, cv2.LINE_AA)
-            cv2.putText(image, ("thumb out, rel, in "+str(thumbOut())+str(thumbRelaxed())+str(thumbIn())), (50, 250), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1, cv2.LINE_AA)
+            cv2.putText(image, ("thumb "+str(thumbPosition())), (50, 250), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1, cv2.LINE_AA)
             cv2.putText(image, ("index "+str(indexFingerUp())), (50, 300), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1, cv2.LINE_AA)
             cv2.putText(image, ("middle "+str(middleFingerUp())), (50, 350), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1, cv2.LINE_AA)
             cv2.putText(image, ("ring "+str(ringFingerUp())), (50, 400), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1, cv2.LINE_AA)
