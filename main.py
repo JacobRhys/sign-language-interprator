@@ -34,8 +34,10 @@ while True:
             index_finger_nuckle=hand_landmarks.landmark[mphands.HandLandmark.INDEX_FINGER_PIP]
             index_finger_base=hand_landmarks.landmark[mphands.HandLandmark.INDEX_FINGER_MCP]
             middle_finger_position=hand_landmarks.landmark[mphands.HandLandmark.MIDDLE_FINGER_TIP]
+            middle_finger_nuckle=hand_landmarks.landmark[mphands.HandLandmark.MIDDLE_FINGER_PIP]
             middle_finger_base=hand_landmarks.landmark[mphands.HandLandmark.MIDDLE_FINGER_MCP]
             ring_finger_position=hand_landmarks.landmark[mphands.HandLandmark.RING_FINGER_TIP]
+            ring_finger_nuckle=hand_landmarks.landmark[mphands.HandLandmark.RING_FINGER_PIP]
             ring_finger_base=hand_landmarks.landmark[mphands.HandLandmark.RING_FINGER_MCP]
             pinky_finger_position=hand_landmarks.landmark[mphands.HandLandmark.PINKY_TIP]
             pinky_finger_base=hand_landmarks.landmark[mphands.HandLandmark.PINKY_MCP]
@@ -50,6 +52,12 @@ while True:
             def isVertical():
                 return not(isHorizontal())
             
+            def isBehind(point1,point2):
+                return (point1.z>point2.z)
+            
+            def isBetween(point1,point2,point3):
+                return (point1.x<point2.x<point3.x or point3.x<point2.x<point1.x)
+                
             def thumbPosition():
                 if (distance(thumb_tip_position,palm_top)*1.5>palm_distance):
                     return "out"
@@ -74,55 +82,67 @@ while True:
             #charicter recognition
             charicter = "?"
             
-            if (isVertical() and (thumbPosition()=="relaxed") and (not indexFingerUp()) and (not middleFingerUp()) and (not ringFingerUp()) and (not pinkyFingerUp())) : 
-                charicter = "A"
             
-            if (isVertical() and (thumbPosition()=="relaxed") and indexFingerUp() and middleFingerUp() and ringFingerUp() and pinkyFingerUp()):
+                
+            def DecisionBranch_BCDGHKLOPQRUVWXZ():
+                global charicter
                 charicter = "B"
+                # add the left side of the decison tree here
                 
-            if ((palm_top.y > index_finger_position.y) and (palm_top.y > middle_finger_position.y) and (palm_top.y > ring_finger_position.y) and (palm_top.y > pinky_finger_position.y) and 
-               (palm_top.x > thumb_tip_position.x) and (palm_top.x > pinky_finger_position.x)):
-                charicter = "C"
+            def DecisionBranch_AEFIJMNSTY():
+                if thumbPosition=="in":
+                    DecisionBranch_EMNST()
+                else:
+                    DecisionBranch_AFIJY()
             
-            if (isVertical() and (thumbPosition()=="relaxed") and indexFingerUp() and (not middleFingerUp()) and (not ringFingerUp()) and (not pinkyFingerUp())) :
-                charicter = "D"
-                
-            if (isVertical() and (thumbPosition()=="in") and (not indexFingerUp()) and (not middleFingerUp()) and (not ringFingerUp()) and (not pinkyFingerUp())) :
-                charicter = "E"
+            def DecisionBranch_EMNST():
+                if isBehind(index_finger_position,thumb_tip_position):
+                    DecisionBranch_EST()
+                else:
+                    DecisionBranch_MN()
             
-            if (isVertical() and middleFingerUp() and ringFingerUp() and pinkyFingerUp() and
-                (distance(index_finger_position,thumb_tip_position)*3<palm_distance)):
-                charicter = "F"
-
-            if (isHorizontal() and (thumbPosition()=="out") and indexFingerUp() and (not middleFingerUp()) and (not ringFingerUp()) and (not pinkyFingerUp())):
-                charicter = "G"
-                
-            if (isHorizontal() and (thumbPosition()=="out") and indexFingerUp() and middleFingerUp() and (not ringFingerUp()) and (not pinkyFingerUp())):
-                charicter = "H"
-                
-            if (isVertical() and (thumbPosition()=="relaxed") and (not indexFingerUp()) and (not middleFingerUp()) and (not ringFingerUp()) and pinkyFingerUp()):
-                charicter = "I"
+            def DecisionBranch_EST():
+                global charicter
+                if isBetween(index_finger_nuckle,thumb_tip_position,middle_finger_nuckle):
+                    charicter = "T"
+                elif (distance(thumb_tip_position,pinky_finger_position < distance(thumb_tip_position,middle_finger_position))):
+                    charicter = "E"
+                else:
+                    charicter = "S"
             
-            if (isVertical() and (thumbPosition()=="relaxed") and (not indexFingerUp()) and (not middleFingerUp()) and (not ringFingerUp()) and pinkyFingerUp()):
-                charicter = "J"
-                
-            if (isVertical() and (thumbPosition()=="relaxed") and indexFingerUp() and middleFingerUp() and (not ringFingerUp()) and (not pinkyFingerUp())):
-                charicter = "K"
+            def DecisionBranch_MN():
+                global charicter
+                if isBetween(ring_finger_nuckle,thumb_tip_position,middle_finger_nuckle):
+                    charicter = "M"
+                else:
+                    charicter = "N"
             
-            if (isVertical() and (thumbPosition()=="out") and indexFingerUp() and (not middleFingerUp()) and (not ringFingerUp()) and (not pinkyFingerUp())) :
-                charicter = "L"
-            
-            if (isVertical() and (thumbPosition()=="in") and (not indexFingerUp()) and (not middleFingerUp()) and (not ringFingerUp()) and (not pinkyFingerUp()) and
-                (thumb_tip_position.z>ring_finger_position.z)) :
-                charicter = "M"
-            
-            if (isVertical() and (thumbPosition()=="in") and (not indexFingerUp()) and (not middleFingerUp()) and (not ringFingerUp()) and (not pinkyFingerUp()) and
-                (thumb_tip_position.z>ring_finger_position.z) and (distance(index_finger_position,middle_finger_position)*1.2<distance(middle_finger_position,ring_finger_position))) :
-                charicter = "N"
-            
-            if (isVertical() and (not middleFingerUp()) and ( not ringFingerUp()) and (not pinkyFingerUp()) and
-                (distance(index_finger_position,thumb_tip_position)*3<palm_distance)):
-                charicter = "O"
+            def DecisionBranch_AFIJY():
+                if (pinkyFingerUp() and not ringFingerUp()):
+                    DecisionBranch_IJY()
+                else:
+                    DecisionBranch_AF()
+                    
+            def DecisionBranch_IJY():
+                global charicter
+                if thumbPosition=="out":
+                    charicter = "Y"
+                elif (((pinky_finger_position.x-pinky_finger_base.x)**2)/2<(pinky_finger_position.y-pinky_finger_base.y)**2):
+                    charicter = "J"
+                else:
+                    charicter = "I"
+                    
+            def DecisionBranch_AF():
+                global charicter
+                if middleFingerUp():
+                    charicter = "F"
+                else:
+                    charicter = "A"
+                    
+            if indexFingerUp():
+                DecisionBranch_BCDGHKLOPQRUVWXZ()
+            else:
+                DecisionBranch_AEFIJMNSTY()
             
             #output charicter onto screen
             cv2.putText(image, charicter, (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 255, 255), 3, cv2.LINE_AA)
