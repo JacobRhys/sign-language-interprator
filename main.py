@@ -89,10 +89,86 @@ while True:
                     DecisionBranch_AEFIJMNSTY()
                 
             def DecisionBranch_BCDGHKLOPQRUVWXZ():
+                if middleFingerUp():
+                    DecisionBranch_BCHKLOPRUVW()
+                else:
+                    DecisionBranch_DGLQXZ()
+                    
+            def DecisionBranch_BCHKLOPRUVW():
+                if ringFingerUp():
+                    DecisionBranch_BCOW()
+                else:
+                    DecisionBranch_HKPRUV()
+                    
+            def DecisionBranch_BCOW():
+                if thumbPosition=="in":
+                    DecisionBranch_BW()
+                else:
+                    DecisionBranch_CO()
+            
+            def DecisionBranch_BW():
                 global charicter
-                charicter = "B"
-                # add the left side of the decison tree here
-                
+                if ringFingerUp():
+                    charicter = "B"
+                else:
+                    charicter = "W"
+                    
+            def DecisionBranch_CO():
+                global charicter
+                if distance(index_finger_position,thumb_tip_position)<distance(index_finger_position,index_finger_nuckle):
+                    charicter = "C"
+                else:
+                    charicter = "O"
+                    
+            def DecisionBranch_HKPRUV():
+                if distance(index_finger_position,middle_finger_base)*1.5<distance(index_finger_position,index_finger_nuckle):
+                    DecisionBranch_HRU()
+                else:
+                    DecisionBranch_KPV()
+            
+            def DecisionBranch_HRU():
+                global charicter
+                if isHorizontal():
+                    charicter = "H"
+                elif ((index_finger_position.z-middle_finger_position.z)**2>(index_finger_position.x-middle_finger_position.x)**2):
+                    charicter = "R"
+                else:
+                    charicter = "U"
+            
+            def DecisionBranch_KPV():
+                global charicter
+                if isHorizontal():
+                    charicter = "P"
+                elif (distance(index_finger_nuckle,thumb_tip_position)<distance(middle_finger_base,thumb_tip_position)):
+                    charicter = "K"
+                else:
+                    charicter = "V"
+            
+            def DecisionBranch_DGLQXZ():
+                if isHorizontal() or (index_finger_base.y<index_finger_position.y):
+                    DecisionBranch_GQ()
+                else:
+                    DecisionBranch_DLXZ()
+            
+            def DecisionBranch_GQ():
+                global charicter
+                if isHorizontal():
+                    charicter = "G"
+                else:
+                    charicter = "Q"
+                    
+            def DecisionBranch_DLXZ():
+                global charicter
+                if thumbPosition=="out":
+                    charicter = "L"
+                elif (distance(index_finger_position,thumb_tip_position)>distance(thumb_tip_position,index_finger_nuckle)):
+                    charicter = "Z"
+                elif (index_finger_position.y-index_finger_nuckle.y*2>distance(index_finger_position,index_finger_nuckle)):
+                    charicter = "D"
+                else:
+                    charicter = "X"
+                    
+            
             def DecisionBranch_AEFIJMNSTY():
                 if thumbPosition=="in":
                     DecisionBranch_EMNST()
@@ -131,7 +207,7 @@ while True:
                 global charicter
                 if thumbPosition=="out":
                     charicter = "Y"
-                elif (((pinky_finger_position.x-pinky_finger_base.x)**2)/2<(pinky_finger_position.y-pinky_finger_base.y)**2):
+                elif (((pinky_finger_position.x-pinky_finger_base.x)**2)<(pinky_finger_position.y-pinky_finger_base.y)**2):
                     charicter = "J"
                 else:
                     charicter = "I"
