@@ -82,7 +82,11 @@ while True:
             #charicter recognition
             charicter = "?"
             
-            
+            def DecisionRoot():
+                if indexFingerUp():
+                    DecisionBranch_BCDGHKLOPQRUVWXZ()
+                else:
+                    DecisionBranch_AEFIJMNSTY()
                 
             def DecisionBranch_BCDGHKLOPQRUVWXZ():
                 global charicter
@@ -139,10 +143,7 @@ while True:
                 else:
                     charicter = "A"
                     
-            if indexFingerUp():
-                DecisionBranch_BCDGHKLOPQRUVWXZ()
-            else:
-                DecisionBranch_AEFIJMNSTY()
+            DecisionRoot()
             
             #output charicter onto screen
             cv2.putText(image, charicter, (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 255, 255), 3, cv2.LINE_AA)
