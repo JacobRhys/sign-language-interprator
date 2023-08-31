@@ -13,9 +13,13 @@ mphands = mp.solutions.hands
 cap = cv2.VideoCapture(0)
 hands = mphands.Hands()
 
-#point distance calculator
-def distance(point1, point2):
-    return math.sqrt((point1.x-point2.x)**2+(point1.y-point2.y)**2+(point1.z-point2.z)**2)
+def normiliser(vectorAxis):
+    normalised = []
+    axrange = max(vectorAxis)-min(vectorAxis)
+    for i in range(0, len(vectorAxis)):
+        normalised.append((vectorAxis[i]-min(vectorAxis))/axrange)
+    return normalised
+
 
 while True:
     data, image = cap.read()
@@ -32,11 +36,19 @@ while True:
                 mp_drawing_styles.get_default_hand_landmarks_style(),
                 mp_drawing_styles.get_default_hand_connections_style()
             )
-            vector = ["z"]
+            vector, vectorX, vectorY, vectorZ= ["?"], [], [], []
+
             for landmark in hand_landmarks.landmark:
-                vector.append(landmark.x)
-                vector.append(landmark.y)
-                vector.append(landmark.z)
+                vectorX.append(landmark.x)
+                vectorY.append(landmark.y)
+                vectorZ.append(landmark.z)
+            #normalise vector
+            
+            vector.extend(normiliser(vectorX))
+            vector.extend(normiliser(vectorY))
+            vector.extend(normiliser(vectorZ))
+            
+            #print(vector)
             
     cv2.imshow('MediaPipe Hands', image)
     if cv2.waitKey(1) & 0xFF == ord('q'):

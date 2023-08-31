@@ -17,6 +17,12 @@ def vectorDistance(vector1, vector2):
         distance += (vector1[i]-float(vector2[i+1]))**2
     return distance**(1/2)
     
+def normiliser(vectorAxis):
+    normalised = []
+    axrange = max(vectorAxis)-min(vectorAxis)
+    for i in range(0, len(vectorAxis)):
+        normalised.append((vectorAxis[i]-min(vectorAxis))/axrange)
+    return normalised
 
 while True:
     data, image = cap.read()
@@ -35,14 +41,21 @@ while True:
             )
             
             #create hand vector
-            vector = []
+            vector, vectorX, vectorY, vectorZ= [], [], [], []
+
             for landmark in hand_landmarks.landmark:
-                vector.append(landmark.x)
-                vector.append(landmark.y)
-                vector.append(landmark.z)
+                vectorX.append(landmark.x)
+                vectorY.append(landmark.y)
+                vectorZ.append(landmark.z)
                 
             distences = []
-            file = open("LetterVectors.csv", "r") 
+            
+            #normalise vector
+            
+            vector.extend(normiliser(vectorX))
+            vector.extend(normiliser(vectorY))
+            vector.extend(normiliser(vectorZ))
+            file = open("LetterVectorsNormalised.csv", "r") 
             reader = csv.reader(file) 
             for row in reader:
                 distences.append([row[0], vectorDistance(vector, row)])
@@ -62,7 +75,7 @@ while True:
             
             charicter = first[0] + " "
             #output charicter onto screen
-            cv2.putText(image, charicter, (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 255, 255), 3, cv2.LINE_AA)
+            cv2.putText(image, charicter, (100, 100), cv2.FONT_HERSHEY_SIMPLEX, 5, (255, 255, 255), 5, cv2.LINE_AA)
             
     cv2.imshow('MediaPipe Hands', image)
     if cv2.waitKey(1) & 0xFF == ord('q'):
