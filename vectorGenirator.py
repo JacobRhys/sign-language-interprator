@@ -3,7 +3,7 @@ import mediapipe as mp
 import math
 import csv
 
-file = open("LetterVectors.csv", "a")
+file = open("LetterVectorsNormalised.csv", "a")
 writer = csv.writer(file)
 
 mp_drawing = mp.solutions.drawing_utils
@@ -36,7 +36,7 @@ while True:
                 mp_drawing_styles.get_default_hand_landmarks_style(),
                 mp_drawing_styles.get_default_hand_connections_style()
             )
-            vector, vectorX, vectorY, vectorZ= ["?"], [], [], []
+            vector, vectorX, vectorY, vectorZ= ["v"], [], [], []
 
             for landmark in hand_landmarks.landmark:
                 vectorX.append(landmark.x)
@@ -51,8 +51,11 @@ while True:
             #print(vector)
             
     cv2.imshow('MediaPipe Hands', image)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    key = cv2.waitKey(1) & 0xFF
+    if key == ord('a'):
         writer.writerow(vector)
+        print (f"Vector saved- {vector[0]}")
+    elif key == ord('q'):
         break
 
 cap.release()

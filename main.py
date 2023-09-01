@@ -75,7 +75,7 @@ while True:
             
             charicter = first[0] + " "
             #output charicter onto screen
-            cv2.putText(image, charicter, (100, 100), cv2.FONT_HERSHEY_SIMPLEX, 5, (255, 255, 255), 5, cv2.LINE_AA)
+            cv2.putText(image, charicter.capitalize(), (50, 150), cv2.FONT_HERSHEY_SIMPLEX , 5, (255, 255, 255), 5, cv2.LINE_AA)
             
     cv2.imshow('MediaPipe Hands', image)
     if cv2.waitKey(1) & 0xFF == ord('q'):
